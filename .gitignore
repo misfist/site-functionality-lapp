@@ -46,6 +46,7 @@ wordpress
 /vendor/
 /bin/
 /tests/
+logs
 
 *.zip
 *.phar

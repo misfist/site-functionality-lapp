@@ -68,6 +68,33 @@ abstract class Base {
 	}
 
 	/**
+	 * Debug log wrapper
+	 *
+	 * @param mixed       $message Message to log.
+	 * @param string|null $prefix  Optional prefix, defaults to calling method.
+	 * @param string|null $channel Optional channel. If provided, logs to
+	 *                    wp-content/plugins/{plugin-name}/logs/{channel}.log.
+	 * @return void
+	 */
+	public static function debug( $message, ?string $prefix = null, ?string $channel = 'debug' ): void {
+		if ( defined( '\WP_DEBUG' ) && \WP_DEBUG ) {
+			$formatted = $prefix ? "{$prefix}: {$message}" : $message;
+
+			$log_dir = trailingslashit( SITE_FUNCTIONALITY_PATH ) . 'logs/';
+
+			if ( ! file_exists( $log_dir ) ) {
+				wp_mkdir_p( $log_dir );
+			}
+
+			$log_file = $log_dir . sanitize_file_name( "{$channel}.log" );
+			$entry    = '[' . gmdate( 'Y-m-d H:i:s' ) . '] ' . $formatted . PHP_EOL;
+
+			// Write only to the channel file, not to PHP error_log
+			@file_put_contents( $log_file, $entry, FILE_APPEND | LOCK_EX );
+		}
+	}
+
+	/**
 	 * Set processing data
 	 *
 	 * @param string $prop
