@@ -1,0 +1,1 @@
+(()=>{"use strict";const e=window.React,t=window.wp.editor;wp.hooks.addFilter("editor.PostTaxonomyType","site-functionality/hierarchical-term-selector",function(o){return function(r){return"post_tag"!==r.slug?(0,e.createElement)(o,{...r}):(0,e.createElement)(t.PostTaxonomiesHierarchicalTermSelector,{...r})}})})();
