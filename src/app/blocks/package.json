@@ -1,28 +1,25 @@
 {
 	"name": "site-functionality",
-	"version": "0.1.0",
-	"description": "Custom blocks.",
-	"author": "Pea",
+	"version": "1.0.0",
+	"description": "Custom blocks",
+	"author": "misfist",
 	"license": "GPL-2.0-or-later",
+	"homepage": "https://github.com/misfist/quincy-site-functionality",
 	"main": "build/index.js",
 	"scripts": {
-		"build": "wp-scripts build --experimental-modules",
+		"build": "wp-scripts build --webpack-copy-php",
+		"start": "wp-scripts start --webpack-copy-php",
 		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
 		"packages-update": "wp-scripts packages-update",
-		"plugin-zip": "wp-scripts plugin-zip",
-		"start": "wp-scripts start --experimental-modules",
-		"manifest": "wp-scripts build-blocks-manifest --input=src --output=build/blocks-manifest.php"
-	},
-	"files": [
-		"[^.]*"
-	],
-	"dependencies": {
-		"@wordpress/element": "^6.8.0",
-		"@wordpress/interactivity": "^6.8.2"
+		"plugin-zip": "wp-scripts plugin-zip"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^30.0.2"
+		"@wordpress/scripts": "^26.12.0"
+	},
+	"dependencies": {
+		"@10up/block-components": "^1.17.2",
+		"classnames": "^2.3.2"
 	}
 }
