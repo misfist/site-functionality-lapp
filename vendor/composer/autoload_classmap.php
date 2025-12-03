@@ -13,6 +13,7 @@ return array(
     'Site_Functionality\\App\\Blocks\\Blocks' => $baseDir . '/src/app/blocks/class-blocks.php',
     'Site_Functionality\\App\\Frontend\\Frontend_Assets' => $baseDir . '/src/app/frontend/class-frontend-assets.php',
     'Site_Functionality\\App\\Integrations\\Integrations' => $baseDir . '/src/app/integrations/class-integrations.php',
+    'Site_Functionality\\App\\Integrations\\Newspack' => $baseDir . '/src/app/integrations/newspack/class-newspack.php',
     'Site_Functionality\\App\\Integrations\\Publication_Checklist' => $baseDir . '/src/app/integrations/publication-checklist/class-publication-checklist.php',
     'Site_Functionality\\App\\Integrations\\Publish_To_Apple_News' => $baseDir . '/src/app/integrations/publish-to-apple-news/class-publish-to-apple-news.php',
     'Site_Functionality\\App\\Post_Types\\Post_Types' => $baseDir . '/src/app/post-types/class-post-types.php',

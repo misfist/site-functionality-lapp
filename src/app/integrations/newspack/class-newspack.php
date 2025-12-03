@@ -1,6 +1,6 @@
 <?php
 /**
- * Content Integrations
+ * Newspack
  *
  * @since   1.0.0
  * @package Site_Functionality
@@ -8,16 +8,13 @@
 namespace Site_Functionality\App\Integrations;
 
 use Site_Functionality\Common\Abstracts\Base;
-use Site_Functionality\App\Integrations\Newspack;
-use Site_Functionality\App\Integrations\Publication_Checklist;
-use Site_Functionality\App\Integrations\Publish_To_Apple_News;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Integrations extends Base {
+class Newspack extends Base {
 
 	/**
 	 * Constructor.
@@ -35,8 +32,8 @@ class Integrations extends Base {
 	 * @return void
 	 */
 	public function init(): void {
-		$newspack = new Newspack( $this->settings );
-		new Publication_Checklist( $this->settings );
-		new Publish_To_Apple_News( $this->settings );
+		if( class_exists( '\Newspack\Patches' ) ) {
+			remove_action( 'admin_menu', array( \Newspack\Patches::class, 'remove_core_appearance_menu_links' ) );
+		}
 	}
 }
