@@ -19,6 +19,7 @@ use Site_Functionality\Common\WP_Includes\I18n;
 use Site_Functionality\App\Post_Types\Post_Types;
 use Site_Functionality\App\Taxonomies\Taxonomies;
 use Site_Functionality\App\Blocks\Blocks;
+use Site_Functionality\App\Integrations\Integrations;
 
 /**
  * Hooks the plugin's classes to WordPress's actions and filters.
@@ -66,7 +67,6 @@ class Site_Functionality {
 		$plugin_i18n = new I18n();
 
 		add_action( 'init', array( $plugin_i18n, 'load_plugin_textdomain' ) );
-
 	}
 
 	/**
@@ -81,7 +81,6 @@ class Site_Functionality {
 
 		add_action( 'admin_enqueue_scripts', array( $admin_assets, 'enqueue_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $admin_assets, 'enqueue_scripts' ) );
-
 	}
 
 	/**
@@ -96,7 +95,6 @@ class Site_Functionality {
 
 		add_action( 'wp_enqueue_scripts', array( $frontend_assets, 'enqueue_styles' ) );
 		add_action( 'wp_enqueue_scripts', array( $frontend_assets, 'enqueue_scripts' ) );
-
 	}
 
 	/**
@@ -105,9 +103,9 @@ class Site_Functionality {
 	 * @since    1.0.0
 	 */
 	protected function load_dependencies(): void {
-		$post_types = new Post_Types( $this->settings );
-		$taxonomies = new Taxonomies( $this->settings );
-		$blocks	 = new Blocks( $this->settings );
+		$post_types  = new Post_Types( $this->settings );
+		$taxonomies  = new Taxonomies( $this->settings );
+		$blocks      = new Blocks( $this->settings );
+		$ntegrations = new Integrations( $this->settings );
 	}
-
 }
