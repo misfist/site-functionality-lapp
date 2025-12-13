@@ -66,7 +66,7 @@ class Topic extends Taxonomy {
 						'aria-label'        => '',
 						'type'              => 'radio',
 						'instructions'      => '',
-						'required'          => 0,
+						'required'          => 1,
 						'conditional_logic' => 0,
 						'wrapper'           => array(
 							'width' => '',
@@ -81,7 +81,7 @@ class Topic extends Taxonomy {
 						'return_format'     => 'value',
 						'allow_null'        => 0,
 						'other_choice'      => 0,
-						'allow_in_bindings' => 0,
+						'allow_in_bindings' => 1,
 						'layout'            => 'vertical',
 						'save_other_choice' => 0,
 					),
