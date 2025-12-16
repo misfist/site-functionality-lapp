@@ -8,6 +8,7 @@
 namespace Site_Functionality\App\Blocks;
 
 use Site_Functionality\Common\Abstracts\Base;
+use Site_Functionality\App\Admin\Admin_Settings;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -53,7 +54,7 @@ class Blocks extends Base {
 	 * @return void
 	 */
 	public function register_blocks(): void {
-		register_block_type_from_metadata( __DIR__ . '/build/block' );
+		register_block_type_from_metadata( __DIR__ . '/build/ad-slot' );
 	}
 
 	/**
