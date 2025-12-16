@@ -1,3 +1,4 @@
+import { addFilter } from '@wordpress/hooks';
 import { PostTaxonomiesHierarchicalTermSelector as HierarchicalTermSelector } from '@wordpress/editor';
 
 function hierarchicalTermSelector( OriginalComponent ) {
@@ -14,7 +15,7 @@ function hierarchicalTermSelector( OriginalComponent ) {
     };
 }
 
-wp.hooks.addFilter( 
+addFilter( 
     'editor.PostTaxonomyType', 
     'site-functionality/hierarchical-term-selector', 
     hierarchicalTermSelector
