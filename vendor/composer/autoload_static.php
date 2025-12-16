@@ -43,6 +43,7 @@ class ComposerStaticInit79748fcebbe0b4d5a437ef9bea3d53bb
         'Site_Functionality\\App\\Integrations\\Newspack' => __DIR__ . '/../..' . '/src/app/integrations/newspack/class-newspack.php',
         'Site_Functionality\\App\\Integrations\\Publication_Checklist' => __DIR__ . '/../..' . '/src/app/integrations/publication-checklist/class-publication-checklist.php',
         'Site_Functionality\\App\\Integrations\\Publish_To_Apple_News' => __DIR__ . '/../..' . '/src/app/integrations/publish-to-apple-news/class-publish-to-apple-news.php',
+        'Site_Functionality\\App\\Post_Types\\Post' => __DIR__ . '/../..' . '/src/app/post-types/class-post.php',
         'Site_Functionality\\App\\Post_Types\\Post_Types' => __DIR__ . '/../..' . '/src/app/post-types/class-post-types.php',
         'Site_Functionality\\App\\Taxonomies\\Taxonomies' => __DIR__ . '/../..' . '/src/app/taxonomies/class-taxonomies.php',
         'Site_Functionality\\App\\Taxonomies\\Topic' => __DIR__ . '/../..' . '/src/app/taxonomies/class-topic.php',
