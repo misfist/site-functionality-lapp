@@ -36,7 +36,10 @@ class Blocks extends Base {
 
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_scripts' ) );
 
-		// add_filter( 'block_categories_all', array( $this, 'register_block_category' ), 10, 2 );
+		add_action( 'init', array( $this, 'register_pattern_category' ) );
+
+		add_filter( 'block_categories_all', array( $this, 'register_block_category' ), 10, 2 );
+
 	}
 
 	/**
@@ -77,11 +80,26 @@ class Blocks extends Base {
 			array(
 				'slug'  => 'lapp',
 				'title' => esc_html__( 'LA Public Press', 'site-functionality' ),
+				'icon'  => '<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2" viewBox="0 0 270 270"><path d="M0 0h270v270H0z" style="fill:#1b1411"/><text x="-103.869" style="font-family:&quot;Georgia-BoldItalic&quot;,&quot;Georgia&quot;,serif;font-weight:700;font-style:italic;font-size:140px;fill:#fff" transform="translate(132.2 155)">L<tspan x="-2.293" y="0">A</tspan></text><path d="M0 220h45v50H0z" style="fill:#c7df23"/><path d="M45 220h45v50H45z" style="fill:#00b2a9"/><path d="M90 220h45v50H90z" style="fill:#00915a"/><path d="M135 220h45v50h-45z" style="fill:#ffc300"/><path d="M180 220h45v50h-45z" style="fill:#ff6a2e"/><path d="M225 220h45v50h-45z" style="fill:#e6360a"/></svg>',
 			)
 		);
 		return $block_categories;
 	}
 
+	/**
+	 * Register Pattern Category
+	 *
+	 * @return void
+	 */
+	public function register_pattern_category(): void {
+		register_block_pattern_category(
+			'ads',
+			array(
+				'label'       => __( 'Ads', 'site-functionality' ),
+				'description' => __( 'Ad patterns', 'site-functionality' ),
+			)
+		);
+	}
 	/**
 	 * Enqueue blocks scripts
 	 *

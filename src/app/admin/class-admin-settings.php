@@ -63,13 +63,13 @@ class Admin_Settings extends Base {
 
 		\acf_add_local_field_group(
 			array(
-				'key'                   => 'group_6940a282e41b9',
+				'key'                   => 'group_ad_slot_settings',
 				'title'                 => __( 'Ad Slot Settings', 'site-functionality' ),
 				'fields'                => array(
 					array(
-						'key'                  => 'field_6940a28420a00',
+						'key'                  => 'field_ad_pattern',
 						'label'                => __( 'Select Ad', 'site-functionality' ),
-						'name'                 => 'ad_pattern',
+						'name'                 => self::$ad_pattern_option,
 						'aria-label'           => '',
 						'type'                 => 'post_object',
 						'instructions'         => __( 'This ad will be configured for all ad slots.', 'site-functionality' ),
@@ -94,7 +94,7 @@ class Admin_Settings extends Base {
 						'bidirectional_target' => array(),
 					),
 					array(
-						'key'               => 'field_6940a2de3ee1d',
+						'key'               => 'field_ad_position',
 						'label'             => __( 'Position', 'site-functionality' ),
 						'name'              => 'position',
 						'aria-label'        => '',
