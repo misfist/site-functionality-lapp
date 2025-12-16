@@ -24,6 +24,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Admin_Settings extends Base {
 
 	/**
+	 * Option name
+	 *
+	 * @var string
+	 */
+	public static $ad_pattern_option = 'ad_pattern';
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0.0
