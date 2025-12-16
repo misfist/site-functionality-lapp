@@ -42,8 +42,6 @@ class Blocks extends Base {
 
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_scripts' ) );
 
-		add_action( 'init', array( $this, 'register_pattern_category' ) );
-
 		add_filter( 'block_categories_all', array( $this, 'register_block_category' ), 10, 2 );
 
 	}
@@ -90,21 +88,6 @@ class Blocks extends Base {
 			)
 		);
 		return $block_categories;
-	}
-
-	/**
-	 * Register Pattern Category
-	 *
-	 * @return void
-	 */
-	public function register_pattern_category(): void {
-		register_block_pattern_category(
-			'ads',
-			array(
-				'label'       => __( 'Ads', 'site-functionality' ),
-				'description' => __( 'Ad patterns', 'site-functionality' ),
-			)
-		);
 	}
 
 	/**
