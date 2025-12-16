@@ -32,6 +32,11 @@ class Blocks extends Base {
 	 * @return void
 	 */
 	public function init(): void {
+		$this->data['namespace'] = 'site-functionality/v1';
+		$this->data['route']     = '/ad-slot';
+
+		add_action( 'rest_api_init', array( $this, 'register_ad_slot_route' ), );
+
 		add_action( 'init', array( $this, 'register_blocks' ) );
 
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_scripts' ) );
@@ -100,6 +105,60 @@ class Blocks extends Base {
 			)
 		);
 	}
+
+	/**
+	 * Register Ad Route
+	 *
+	 * @return void
+	 */
+	public function register_ad_slot_route(): void {
+		register_rest_route(
+			$this->data['namespace'],
+			$this->data['route'],
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'render_ad_slot' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+			)
+		);
+
+	}
+
+	/**
+	 * Get rendered HTML for the selected ad pattern.
+	 *
+	 * @return obj \WP_REST_Response
+	 */
+	public function render_ad_slot(): \WP_REST_Response {
+		$option_name   = Admin_Settings::$ad_pattern_option;
+		$ad_pattern_id = (int) get_option( 'options_' . $option_name );
+
+		if ( ! $ad_pattern_id ) {
+			return rest_ensure_response(
+				array(
+					'html' => '',
+				)
+			);
+		}
+
+		$ad = get_post( $ad_pattern_id );
+		if ( ! $ad || is_wp_error( $ad ) ) {
+			return rest_ensure_response(
+				array(
+					'html' => '',
+				)
+			);
+		}
+
+		return rest_ensure_response(
+			array(
+				'html' => do_blocks( $ad->post_content ),
+			)
+		);
+	}
+
 	/**
 	 * Enqueue blocks scripts
 	 *
