@@ -6,7 +6,11 @@ function hierarchicalTermSelector( OriginalComponent ) {
         	return <OriginalComponent { ...props } />;
         }
 
-        return <HierarchicalTermSelector { ...props } />;
+        return (
+			<div className="is-hierarchical-post-tags">
+				<HierarchicalTermSelector { ...props } />
+			</div>
+		);
     };
 }
 

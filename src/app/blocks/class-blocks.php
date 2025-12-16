@@ -43,7 +43,6 @@ class Blocks extends Base {
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_scripts' ) );
 
 		add_filter( 'block_categories_all', array( $this, 'register_block_category' ), 10, 2 );
-
 	}
 
 	/**
@@ -107,7 +106,6 @@ class Blocks extends Base {
 				},
 			)
 		);
-
 	}
 
 	/**
@@ -116,7 +114,7 @@ class Blocks extends Base {
 	 * @return obj \WP_REST_Response
 	 */
 	public function render_cta_slot(): \WP_REST_Response {
-		$option_name   = Admin_Settings::$cta_pattern_option;
+		$option_name    = Admin_Settings::$cta_pattern_option;
 		$cta_pattern_id = (int) get_option( 'options_' . $option_name );
 
 		if ( ! $cta_pattern_id ) {
@@ -183,6 +181,11 @@ class Blocks extends Base {
 			array(),
 			$asset_file['version'],
 			'screen'
+		);
+
+		wp_add_inline_style(
+			'site-functionality',
+			'.is-hierarchical-post-tags .editor-post-taxonomies__hierarchical-terms-add{display:none;pointer-events:none;}'
 		);
 	}
 }
