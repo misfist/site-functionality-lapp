@@ -43,12 +43,12 @@ const Edit = ( props ) => {
 
 	useEffect( () => {
 		if ( ! anchor ) {
-			setAttributes( { anchor: `ad-slot-${ crypto.randomUUID() }` } );
+			setAttributes( { anchor: `cta-slot-${ crypto.randomUUID() }` } );
 		}
 	}, [ anchor, setAttributes ] );
 
 	useEffect( () => {
-		apiFetch( { path: '/site-functionality/v1/ad-slot' } )
+		apiFetch( { path: '/site-functionality/v1/cta-slot' } )
 			.then( ( response ) => setHtml( response?.html || '' ) )
 			.catch( () => setHtml( '' ) );
 	}, [] );

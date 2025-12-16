@@ -34,9 +34,9 @@ class Blocks extends Base {
 	 */
 	public function init(): void {
 		$this->data['namespace'] = 'site-functionality/v1';
-		$this->data['route']     = '/ad-slot';
+		$this->data['route']     = '/cta-slot';
 
-		add_action( 'rest_api_init', array( $this, 'register_ad_slot_route' ), );
+		add_action( 'rest_api_init', array( $this, 'register_cta_slot_route' ), );
 
 		add_action( 'init', array( $this, 'register_blocks' ) );
 
@@ -54,7 +54,7 @@ class Blocks extends Base {
 	 * @return void
 	 */
 	public function register_blocks(): void {
-		register_block_type_from_metadata( __DIR__ . '/build/ad-slot' );
+		register_block_type_from_metadata( __DIR__ . '/build/cta-slot' );
 	}
 
 	/**
@@ -112,13 +112,13 @@ class Blocks extends Base {
 	 *
 	 * @return void
 	 */
-	public function register_ad_slot_route(): void {
+	public function register_cta_slot_route(): void {
 		register_rest_route(
 			$this->data['namespace'],
 			$this->data['route'],
 			array(
 				'methods'             => 'GET',
-				'callback'            => array( $this, 'render_ad_slot' ),
+				'callback'            => array( $this, 'render_cta_slot' ),
 				'permission_callback' => function () {
 					return current_user_can( 'edit_posts' );
 				},
@@ -132,11 +132,11 @@ class Blocks extends Base {
 	 *
 	 * @return obj \WP_REST_Response
 	 */
-	public function render_ad_slot(): \WP_REST_Response {
-		$option_name   = Admin_Settings::$ad_pattern_option;
-		$ad_pattern_id = (int) get_option( 'options_' . $option_name );
+	public function render_cta_slot(): \WP_REST_Response {
+		$option_name   = Admin_Settings::$cta_pattern_option;
+		$cta_pattern_id = (int) get_option( 'options_' . $option_name );
 
-		if ( ! $ad_pattern_id ) {
+		if ( ! $cta_pattern_id ) {
 			return rest_ensure_response(
 				array(
 					'html' => '',
@@ -144,8 +144,8 @@ class Blocks extends Base {
 			);
 		}
 
-		$ad = get_post( $ad_pattern_id );
-		if ( ! $ad || is_wp_error( $ad ) ) {
+		$cta = get_post( $cta_pattern_id );
+		if ( ! $cta || is_wp_error( $cta ) ) {
 			return rest_ensure_response(
 				array(
 					'html' => '',
@@ -155,7 +155,7 @@ class Blocks extends Base {
 
 		return rest_ensure_response(
 			array(
-				'html' => do_blocks( $ad->post_content ),
+				'html' => do_blocks( $cta->post_content ),
 			)
 		);
 	}

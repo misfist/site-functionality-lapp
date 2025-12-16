@@ -54,7 +54,7 @@ class Post extends Base {
 				),
 			),
 			array(
-				'site-functionality/ad-slot',
+				'site-functionality/cta-slot',
 				array(
 					'lock' => array(
 						'move'   => false,

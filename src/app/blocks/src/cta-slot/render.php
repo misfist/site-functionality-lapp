@@ -11,14 +11,14 @@
  */
 use Site_Functionality\App\Admin\Admin_Settings;
 
-$option_name   = Admin_Settings::$ad_pattern_option;
-$ad_pattern_id = get_option( 'options_' . $option_name );
-if ( ! $ad_pattern_id ) {
+$option_name   = Admin_Settings::$cta_pattern_option;
+$cta_pattern_id = get_option( 'options_' . $option_name );
+if ( ! $cta_pattern_id ) {
 	return '';
 }
 
-$ad = get_post( (int) $ad_pattern_id );
-if ( ! $ad || is_wp_error( $ad ) ) {
+$cta = get_post( (int) $cta_pattern_id );
+if ( ! $cta || is_wp_error( $cta ) ) {
 	return '';
 }
 
@@ -28,9 +28,9 @@ $wrapper_attributes = get_block_wrapper_attributes(
 	)
 );
 
-$ad_content = $ad->post_content;
+$cta_content = $cta->post_content;
 ?>
 
 <div <?php echo $wrapper_attributes; ?>>
-	<?php echo do_blocks( $ad_content ); ?>
+	<?php echo do_blocks( $cta_content ); ?>
 </div>

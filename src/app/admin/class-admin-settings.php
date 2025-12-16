@@ -28,7 +28,14 @@ class Admin_Settings extends Base {
 	 *
 	 * @var string
 	 */
-	public static $ad_pattern_option = 'ad_pattern';
+	public static $cta_pattern_option = 'cta_pattern';
+
+	/**
+	 * Option page slug
+	 *
+	 * @var string
+	 */
+	public static $page_slug = 'cta-settings';
 
 	/**
 	 * Constructor.
@@ -64,12 +71,12 @@ class Admin_Settings extends Base {
 		\acf_add_local_field_group(
 			array(
 				'key'                   => 'group_ad_slot_settings',
-				'title'                 => __( 'Ad Slot Settings', 'site-functionality' ),
+				'title'                 => __( 'CTA Slot Settings', 'site-functionality' ),
 				'fields'                => array(
 					array(
 						'key'                  => 'field_ad_pattern',
-						'label'                => __( 'Select Ad', 'site-functionality' ),
-						'name'                 => self::$ad_pattern_option,
+						'label'                => __( 'Inline CTA', 'site-functionality' ),
+						'name'                 => self::$cta_pattern_option,
 						'aria-label'           => '',
 						'type'                 => 'post_object',
 						'instructions'         => __( 'This ad will be configured for all ad slots.', 'site-functionality' ),
@@ -94,12 +101,12 @@ class Admin_Settings extends Base {
 						'bidirectional_target' => array(),
 					),
 					array(
-						'key'               => 'field_ad_position',
+						'key'               => 'field_cta_position',
 						'label'             => __( 'Position', 'site-functionality' ),
-						'name'              => 'position',
+						'name'              => 'cta_position',
 						'aria-label'        => '',
 						'type'              => 'range',
-						'instructions'      => __( 'Number of paragraphs from top.', 'site-functionality' ),
+						'instructions'      => __( 'Number of paragraphs from top to display inline CTA.', 'site-functionality' ),
 						'required'          => 0,
 						'conditional_logic' => 0,
 						'wrapper'           => array(
@@ -121,7 +128,7 @@ class Admin_Settings extends Base {
 						array(
 							'param'    => 'options_page',
 							'operator' => '==',
-							'value'    => 'ad-settings',
+							'value'    => self::$page_slug,
 						),
 					),
 				),
@@ -151,10 +158,10 @@ class Admin_Settings extends Base {
 
 		\acf_add_options_page(
 			array(
-				'page_title'      => esc_html__( 'Ad Settings', 'site-functionality' ),
-				'menu_slug'       => 'ad-settings',
+				'page_title'      => esc_html__( 'CTA Settings', 'site-functionality' ),
+				'menu_slug'       => self::$page_slug,
 				'parent_slug'     => 'options-general.php',
-				'menu_title'      => esc_html__( 'Ad Settings', 'site-functionality' ),
+				'menu_title'      => esc_html__( 'CTA Settings', 'site-functionality' ),
 				'position'        => 7,
 				'redirect'        => false,
 				'updated_message' => esc_attr__( 'Settings Updated', 'site-functionality' ),
