@@ -1,12 +1,12 @@
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
-  "name": "site-functionality/ad-slot",
+  "name": "site-functionality/cta-slot",
   "version": "0.1.0",
-  "title": "Global Ad Slot",
+  "title": "Global CTA Slot",
   "category": "lapp",
   "icon": "format-image",
-  "description": "Displays the globally configured ad.",
+  "description": "Displays the globally configured CTA.",
   "attributes": {
     "anchor": {
       "type": "string"
