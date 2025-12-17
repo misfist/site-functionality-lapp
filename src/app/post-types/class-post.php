@@ -109,7 +109,13 @@ class Post extends Base {
 			$cta_content = $cta->post_content;
 
 			$did_run       = true;
-			$block_content = do_blocks( $cta_content );
+
+			$block_content = sprintf( '
+				<div class="wp-block-site-functionality-cta-slot%s" id="cta-slot-%s">%s</div>',
+				' before-content alignfull',
+				uniqid(),
+				do_blocks( $cta_content )
+			);
 
 			return $block_content . $content;
 		}
@@ -153,7 +159,12 @@ class Post extends Base {
 			$cta_content = $cta->post_content;
 
 			$did_run       = true;
-			$block_content = do_blocks( $cta_content );
+			$block_content = sprintf( '
+				<div class="wp-block-site-functionality-cta-slot%s" id="cta-slot-%s">%s</div>',
+				' after-content alignfull',
+				uniqid(),
+				do_blocks( $cta_content )
+			);
 
 			return $content . $block_content;
 		}
