@@ -42,7 +42,13 @@ class Blocks extends Base {
 
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_scripts' ) );
 
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_blocks_styles' ) );
+
 		add_filter( 'block_categories_all', array( $this, 'register_block_category' ), 10, 2 );
+
+		add_filter( 'render_block', array( $this, 'wrap_mailchimp_block' ), 10, 2 );
+
+		add_filter( 'register_block_type_args', array( $this, 'filter_mailchimp_args' ), 10, 2 );
 	}
 
 	/**
@@ -142,6 +148,77 @@ class Blocks extends Base {
 	}
 
 	/**
+	 * Wrap Mailchimp for WP form block output with alignment classes.
+	 *
+	 * @param string $block_content Rendered block HTML.
+	 * @param array  $block         Parsed block data.
+	 * @return string
+	 */
+	public function wrap_mailchimp_block( $block_content, $block ) {
+		if ( empty( $block['blockName'] ) || 'mailchimp-for-wp/form' !== $block['blockName'] ) {
+			return $block_content;
+		}
+
+		if ( empty( $block['attrs']['align'] ) || ! is_string( $block['attrs']['align'] ) ) {
+			return $block_content;
+		}
+
+		$align_class = 'align' . sanitize_html_class( $block['attrs']['align'] );
+
+		return sprintf(
+			'<div class="%1$s">%2$s</div>',
+			esc_attr( $align_class ),
+			$block_content
+		);
+	}
+
+	/**
+	 * Add align attribute support to Mailchimp for WP form block server-side.
+	 *
+	 * @param array  $args       Block args.
+	 * @param string $block_name Block name.
+	 * @return array
+	 */
+	public function filter_mailchimp_args( array $args, string $block_name ): array {
+		if ( 'mailchimp-for-wp/form' !== $block_name ) {
+			return $args;
+		}
+
+		$args['attributes']          = isset( $args['attributes'] ) ? $args['attributes'] : array();
+		$args['attributes']['align'] = array(
+			'type' => 'string',
+		);
+
+		return $args;
+	}
+
+	/**
+	 * Enqueue front-end block styles.
+	 *
+	 * @return void
+	 */
+	public function enqueue_blocks_styles(): void {
+		$asset_file_path = plugin_dir_path( __FILE__ ) . 'build/index.asset.php';
+		$version         = $this->settings->get_plugin_version();
+
+		$asset_file = array(
+			'version' => $version,
+		);
+
+		if ( is_readable( $asset_file_path ) ) {
+			$asset_file = include $asset_file_path;
+		}
+
+		wp_enqueue_style(
+			'site-functionality-front',
+			plugins_url( '/build/style-index.css', __FILE__ ),
+			array(),
+			$asset_file['version'],
+			'screen'
+		);
+	}
+
+	/**
 	 * Enqueue blocks scripts
 	 *
 	 * @return void
@@ -176,7 +253,7 @@ class Blocks extends Base {
 			false
 		);
 		wp_enqueue_style(
-			'site-functionality',
+			'site-functionality-admin',
 			\plugins_url( '/build/index.css', __FILE__ ),
 			array(),
 			$asset_file['version'],
