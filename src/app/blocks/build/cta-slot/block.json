@@ -15,7 +15,17 @@
   "example": {},
   "supports": {
     "html": false,
-    "anchor": true
+    "anchor": true,
+    "align": [
+      "wide",
+      "full",
+      "center",
+      "left",
+      "right"
+    ],
+    "color": {
+      "background": true
+    }
   },
   "textdomain": "site-functionality",
   "editorScript": "file:./index.js",
