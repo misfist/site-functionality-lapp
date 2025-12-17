@@ -1,2 +1,2 @@
-import './checklist';
+// import './checklist';
 import './taxonomy-ui';

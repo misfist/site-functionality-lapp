@@ -1,19 +1,21 @@
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState  } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-
 
 function FeaturedImageChecklistItem( OriginalComponent ) {
 	return function Wrapper( props ) {
+
 		const featuredMediaId = useSelect(
-			( selectStore ) => selectStore( 'core/editor' ).getEditedPostAttribute( 'featured_media' ),
+			( select ) => select( 'core/editor' ).getEditedPostAttribute( 'featured_media' ),
 			[]
 		);
+
 		const hasFeaturedImage = Boolean( featuredMediaId );
-		const status = hasFeaturedImage ? 'complete' : 'incomplete';
-		const message = hasFeaturedImage
+
+		const status = hasFeaturedImage  ? 'complete' : 'incomplete';
+
+		const message = hasFeaturedImage 
 			? __( 'Featured image is set', 'site-functionality' )
 			: __( 'Add a featured image', 'site-functionality' );
 
@@ -21,9 +23,6 @@ function FeaturedImageChecklistItem( OriginalComponent ) {
 			...props,
 			status,
 			message,
-			renderStatusIcon: function renderStatusIconOverride() {
-				return props.renderStatusIcon( status );
-			},
 		};
 
         console.log( 'hasFeaturedImage', hasFeaturedImage );
