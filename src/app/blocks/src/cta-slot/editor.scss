@@ -1,0 +1,17 @@
+/**
+ * The following styles get applied inside the editor only.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+
+.wp-block-site-functionality-cta-slot {
+    .is-content-justification-center {
+        form {
+            text-align: center;
+        }
+    }
+
+    &.has-background {
+        padding: var( --wp--preset--spacing--50, 2em );
+    }
+}

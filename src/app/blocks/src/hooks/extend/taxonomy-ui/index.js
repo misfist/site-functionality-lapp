@@ -1,3 +1,4 @@
+import { addFilter } from '@wordpress/hooks';
 import { PostTaxonomiesHierarchicalTermSelector as HierarchicalTermSelector } from '@wordpress/editor';
 
 function hierarchicalTermSelector( OriginalComponent ) {
@@ -6,11 +7,15 @@ function hierarchicalTermSelector( OriginalComponent ) {
         	return <OriginalComponent { ...props } />;
         }
 
-        return <HierarchicalTermSelector { ...props } />;
+        return (
+			<div className="is-hierarchical-post-tags">
+				<HierarchicalTermSelector { ...props } />
+			</div>
+		);
     };
 }
 
-wp.hooks.addFilter( 
+addFilter( 
     'editor.PostTaxonomyType', 
     'site-functionality/hierarchical-term-selector', 
     hierarchicalTermSelector

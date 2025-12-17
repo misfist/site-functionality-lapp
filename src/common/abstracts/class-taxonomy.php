@@ -85,7 +85,7 @@ abstract class Taxonomy extends Base {
 
 		$args = array(
 			'labels'            => $labels,
-			'hierarchical'      => false,
+			'hierarchical'      => ( isset( $this::$taxonomy['hierarchical'] ) && $this::$taxonomy['hierarchical'] ) ? : false,
 			'public'            => true,
 			'show_ui'           => true,
 			'show_admin_column' => true,

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "site-functionality/cta-slot",
+  "version": "0.1.0",
+  "title": "Global CTA Slot",
+  "category": "lapp",
+  "icon": "format-image",
+  "description": "Displays the globally configured CTA.",
+  "attributes": {
+    "anchor": {
+      "type": "string"
+    }
+  },
+  "example": {},
+  "supports": {
+    "html": false,
+    "anchor": true,
+    "align": [
+      "wide",
+      "full",
+      "center",
+      "left",
+      "right"
+    ],
+    "color": {
+      "background": true
+    }
+  },
+  "textdomain": "site-functionality",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php",
+  "viewScript": "file:./view.js"
+}

@@ -8,6 +8,7 @@
 namespace Site_Functionality\App\Post_Types;
 
 use Site_Functionality\Common\Abstracts\Base;
+use Site_Functionality\App\Post_Types\Post;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -32,7 +33,7 @@ class Post_Types extends Base {
 	 * @return void
 	 */
 	public function init(): void {
-		// new Publication( $this->settings );
+		$post = new Post( $this->settings );
 
 		\add_filter( 'page-links-to-post-types', array( $this, 'external_links' ) );
 	}

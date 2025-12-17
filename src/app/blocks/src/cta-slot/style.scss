@@ -1,0 +1,34 @@
+/**
+ * The following styles get applied both on the front of your site
+ * and in the editor.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+
+.wp-block-site-functionality-cta-slot {
+    .is-content-justification-center {
+        form {
+            text-align: center;
+        }
+    }
+
+    &.has-background {
+        padding: var( --wp--preset--spacing--50, 2em );
+    }
+}
+
+.entry-content > .wp-block-site-functionality-cta-slot {
+    &.alignwide {
+        width: min( 100vw, var( --wp--style--global--wide-size, 1200px ) );
+        max-width: none;
+        margin-left: calc( 50% - min( 50vw, ( var( --wp--style--global--wide-size, 1200px ) / 2 ) ) );
+        margin-right: calc( 50% - min( 50vw, ( var( --wp--style--global--wide-size, 1200px ) / 2 ) ) );
+    }
+
+    &.alignfull {
+        width: 100vw;
+        max-width: 100vw;
+        margin-left: calc( 50% - 50vw );
+        margin-right: calc( 50% - 50vw );
+    }
+}
