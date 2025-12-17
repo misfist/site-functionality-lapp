@@ -35,10 +35,23 @@ class Publication_Checklist extends Base {
 	 * @return void
 	 */
 	public function init(): void {
-		add_action( 'altis.publication-checklist.register_prepublish_checks', array( $this, 'register_categories' ) );
-		add_action( 'altis.publication-checklist.register_prepublish_checks', array( $this, 'register_featured_image' ) );
-		add_action( 'altis.publication-checklist.register_prepublish_checks', array( $this, 'register_tags' ) );
 		add_action( 'altis.publication-checklist.register_prepublish_checks', array( $this, 'register_cta' ) );
+		add_action( 'altis.publication-checklist.register_prepublish_checks', array( $this, 'register_featured_image' ) );
+		add_action( 'altis.publication-checklist.register_prepublish_checks', array( $this, 'register_categories' ) );
+		add_action( 'altis.publication-checklist.register_prepublish_checks', array( $this, 'register_tags' ) );
+		add_filter(
+			'altis.publication-checklist.block_on_failing',
+			array( $this, 'enforce_blocking' )
+		);
+	}
+
+	/**
+	 * Enforce Publication Checklist blocking on failing checks.
+	 *
+	 * @return bool
+	 */
+	public function enforce_blocking() {
+		return false;
 	}
 
 	/**
@@ -78,18 +91,18 @@ class Publication_Checklist extends Base {
 		register_prepublish_check(
 			'featured-image',
 			array(
-				'type'      => array(
-					'post',
-				),
+				'type'      => array( 'post' ),
 				'run_check' => function ( array $post, array $meta ): Status {
-					$featured_image = $meta['_thumbnail_id'] ?? array();
-					$status     = ( count( $featured_image ) !== 1 || empty( $featured_image[0] ) ) ? Status::INCOMPLETE : Status::COMPLETE;
+					if ( isset( $meta['_thumbnail_id'] ) && $meta['_thumbnail_id'] ) {
+						return new Status( Status::COMPLETE, __( 'Featured Image is set', 'site-functionality' ) );
+					}
 
-					return new Status( $status, 'Add a featured image' );
+					return new Status( STATUS::INCOMPLETE, __( 'Add Featured Image', 'site-functionality' ) );
 				},
 			)
 		);
 	}
+
 
 	/**
 	 * Register Prepublish Checks
