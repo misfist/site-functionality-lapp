@@ -8,6 +8,7 @@
 namespace Site_Functionality\App\Integrations;
 
 use Site_Functionality\Common\Abstracts\Base;
+use Site_Functionality\App\Post_Types\Post;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -15,6 +16,40 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Publish_To_Apple_News extends Base {
+
+	/**
+	 * CTA block name.
+	 *
+	 * @var string
+	 */
+	public static $cta_block_name = 'site-functionality/cta-slot';
+
+	/**
+	 * Option name
+	 *
+	 * @var string
+	 */
+	public static $cta_option_id = 'options_apple_news_cta_pattern';
+
+
+	/**
+	 * Option name
+	 *
+	 * @var string
+	 */
+	public static $cta_position_id = 'options_apple_news_cta_position';
+
+	/**
+	 * Block names
+	 *
+	 * @var array
+	 */
+	public static $qualifying_blocks = array(
+		'core/paragraph',
+		'core/group',
+		'core/list',
+		'core/image',
+	);
 
 	/**
 	 * Constructor.
@@ -548,51 +583,138 @@ class Publish_To_Apple_News extends Base {
 	}
 
 	/**
-	 * Filter Before
+	 * Inject the selected synced pattern after N qualifying top-level blocks.
 	 *
-	 * @param string $content
+	 * NOTE: This runs on the `the_content` filter *before* `do_blocks` (priority < 9).
+	 *
+	 * At this point, `$content` contains raw serialized block markup
+	 * (`<!-- wp:... -->`), not rendered HTML. `WP_Block_Processor` operates
+	 * on this markup to calculate an exact byte offset for insertion.
+	 *
+	 * The injected `core/block` reference is rendered later when `do_blocks`
+	 * runs at priority 9.
+	 *
+	 * @param string $content Post content.
 	 * @param int    $post_id
-	 *
-	 * @return void
+	 * @return string $content Post content.
 	 */
-	public function filter_apple_news_content_pre( $content, $post_id ) {
-		$before_ids = get_option( 'options_before_content' );
-		$after_ids  = get_option( 'options_after_content' );
+	public function filter_apple_news_content_pre( string $content, int $post_id ): string {
+		remove_filter( 'the_content', array( Post::class, 'cta_before_content' ), 1 );
+		remove_filter( 'the_content', array( Post::class, 'cta_after_content' ), 1 );
+		remove_filter( 'the_content', array( Post::class, 'cta_inline_content' ), 8 );
 
-		error_log( __METHOD__ . ' SNIPPET $before_ids = ' . print_r( $before_ids, true ) );
-		error_log( __METHOD__ . ' SNIPPET $after_ids = ' . print_r( $after_ids, true ) );
+		static $did_run = array();
 
-		if ( empty( $before_ids ) && empty( $after_ids ) ) {
+		if ( isset( $did_run[ $post_id ] ) ) {
 			return $content;
 		}
 
-		if ( is_array( $before_ids ) && ! empty( $before_ids ) ) {
-			$before_html = self::render_block_patterns( $before_ids );
-			$content     = '<p style="text-align:center">' . $before_html . '</p>' . $content;
+		if ( has_block( self::$cta_block_name, $content ) ) {
+			return $content;
 		}
 
-		if ( is_array( $after_ids ) && ! empty( $after_ids ) ) {
-			$after_html = self::render_block_patterns( $after_ids );
-			$content   .= '<p style="text-align:center">' . $after_html . '</p>';
+		if ( '' === trim( $content ) ) {
+			return $content;
+		}
+
+		$pattern_id = absint( get_option( self::$cta_option_id ) );
+		if ( 0 === $pattern_id ) {
+			return $content;
+		}
+
+		$insert_after = absint( get_option( self::$cta_position_id ) );
+		if ( $insert_after < 1 ) {
+			return $content;
+		}
+
+		$pattern_serialized = self::generate_serialized_content( $pattern_id );
+
+		$processor = new \WP_Block_Processor( $content );
+		$count     = 0;
+
+		while ( $processor->next_block( '*' ) ) {
+			if ( 1 !== $processor->get_depth() ) {
+				continue;
+			}
+
+			$block_type = $processor->get_block_type();
+			if ( empty( $block_type ) || ! in_array( $block_type, self::$qualifying_blocks, true ) ) {
+				continue;
+			}
+
+			++$count;
+
+			if ( $count !== $insert_after ) {
+				continue;
+			}
+
+			$processor->extract_full_block_and_advance();
+			$span   = $processor->get_span();
+			$offset = $span->start ?? strlen( $content );
+
+			$did_run[ $post_id ] = true;
+
+			return substr( $content, 0, $offset )
+				. "\n"
+				. $pattern_serialized
+				. "\n"
+				. substr( $content, $offset );
 		}
 
 		return $content;
 	}
 
 	/**
-	 * Get rendered HTML from block pattern IDs.
+	 * Generate the serialized Group + synced-pattern reference markup.
 	 *
-	 * @param array $ids Array of post IDs for block patterns.
-	 * @return string Rendered HTML from all valid patterns.
+	 * @param int $pattern_id Synced pattern (wp_block) post ID.
+	 * @return string Serialized block markup.
 	 */
-	public static function render_block_patterns( array $ids ) {
+	public static function generate_serialized_content( int $pattern_id ): string {
+		$block_align     = get_post_meta( $pattern_id, 'pattern_align', true );
+		$block_justify   = get_post_meta( $pattern_id, 'pattern_justify', true );
+		$block_className = 'wp-block-' . str_replace( '/', '-', self::$cta_block_name );
+
+		$wrapper_attributes = array(
+			'className' => sprintf(
+				'%s%s',
+				$block_className,
+				( $block_align ) ? ' align' . $block_align : ''
+			),
+			'align'     => $block_align ?? '',
+			'layout'    => array(
+				'justifyContent' => $block_justify ?? '',
+			),
+		);
+
+		$wrapper_class = $wrapper_attributes['className'];
+
+		$pattern_serialized = sprintf(
+			'<!-- wp:group %1$s -->' . "\n" .
+			'<div class="wp-block-group %2$s">' . "\n" .
+			'<!-- wp:block {"ref":%3$d} /-->' . "\n" .
+			'</div>' . "\n" .
+			'<!-- /wp:group -->',
+			wp_json_encode( $wrapper_attributes ),
+			esc_attr( $wrapper_class ),
+			$pattern_id
+		);
+
+		return $pattern_serialized;
+	}
+
+	/**
+	 * Get rendered HTML from block pattern ID.
+	 *
+	 * @param int $id ID for block pattern.
+	 * @return string Rendered HTML.
+	 */
+	public static function render_block_patterns( int $id ) {
 		$html = '';
 
-		foreach ( $ids as $id ) {
-			$block = get_post( (int) $id );
-			if ( $block && $block->post_type === 'wp_block' ) {
-				$html .= do_blocks( $block->post_content );
-			}
+		$block = get_post( (int) $id );
+		if ( $block && $block->post_type === 'wp_block' ) {
+			$html .= do_blocks( $block->post_content );
 		}
 
 		return $html;
