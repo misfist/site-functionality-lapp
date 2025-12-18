@@ -67,11 +67,11 @@ class Post extends Base {
 
 		add_action( 'init', array( $this, 'register_template' ), 20 );
 
-		add_filter( 'the_content', array( $this, 'cta_before_content' ), 1 );
+		add_filter( 'the_content', array( Post::class, 'cta_before_content' ), 1 );
 
-		add_filter( 'the_content', array( $this, 'cta_after_content' ), 1 );
+		add_filter( 'the_content', array( Post::class, 'cta_after_content' ), 1 );
 
-		add_filter( 'the_content', array( $this, 'cta_inline_content' ), 8 );
+		add_filter( 'the_content', array( Post::class, 'cta_inline_content' ), 8 );
 	}
 
 	/**
@@ -114,7 +114,7 @@ class Post extends Base {
 	 *
 	 * @return string $content
 	 */
-	public function cta_before_content( $content ) {
+	public static function cta_before_content( $content ) {
 		if ( ! is_admin() &&
 			! wp_is_json_request() &&
 			! is_feed() &&
@@ -164,7 +164,7 @@ class Post extends Base {
 	 *
 	 * @return string $content
 	 */
-	public function cta_after_content( $content ): string {
+	public static function cta_after_content( $content ): string {
 		if ( ! is_admin() &&
 			! wp_is_json_request() &&
 			! is_feed() &&
@@ -222,7 +222,7 @@ class Post extends Base {
 	 * @param string $content Post content.
 	 * @return string $content Post content.
 	 */
-	public function cta_inline_content( string $content ): string {
+	public static function cta_inline_content( string $content ): string {
 		static $did_run = false;
 
 		if ( ! is_singular( self::POST_TYPE['id'] ) || ! in_the_loop() || ! is_main_query() ) {
@@ -251,7 +251,7 @@ class Post extends Base {
 			return $content;
 		}
 
-		$pattern_serialized = $this->generate_serialized_content( $pattern_id );
+		$pattern_serialized = self::generate_serialized_content( $pattern_id );
 
 		$processor = new \WP_Block_Processor( $content );
 		$count     = 0;
@@ -294,7 +294,7 @@ class Post extends Base {
 	 * @param int $pattern_id Synced pattern (wp_block) post ID.
 	 * @return string Serialized block markup.
 	 */
-	public function generate_serialized_content( int $pattern_id ): string {
+	public static function generate_serialized_content( int $pattern_id ): string {
 		$block_align     = get_post_meta( $pattern_id, 'pattern_align', true );
 		$block_justify   = get_post_meta( $pattern_id, 'pattern_justify', true );
 		$block_className = 'wp-block-' . str_replace( '/', '-', self::$cta_block_name );
