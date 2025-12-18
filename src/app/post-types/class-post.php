@@ -142,7 +142,6 @@ class Post extends Base {
 
 			$cta_content = $cta->post_content;
 
-
 			$block_content = sprintf(
 				'
 				<div class="wp-block-site-functionality-cta-slot%s" id="cta-slot-%s">%s</div>',
@@ -150,7 +149,7 @@ class Post extends Base {
 				uniqid(),
 				do_blocks( $cta_content )
 			);
-			
+
 			$did_run = true;
 
 			return $block_content . $content;
@@ -201,7 +200,7 @@ class Post extends Base {
 				do_blocks( $cta_content )
 			);
 
-			$did_run       = true;
+			$did_run = true;
 
 			return $content . $block_content;
 		}
@@ -252,10 +251,7 @@ class Post extends Base {
 			return $content;
 		}
 
-		$pattern_serialized = sprintf(
-			'<!-- wp:block {"ref":%d} /-->',
-			$pattern_id
-		);
+		$pattern_serialized = $this->generate_serialized_content( $pattern_id );
 
 		$processor = new \WP_Block_Processor( $content );
 		$count     = 0;
@@ -280,7 +276,7 @@ class Post extends Base {
 			$span   = $processor->get_span();
 			$offset = $span->start ?? strlen( $content );
 
-			$did_run       = true;
+			$did_run = true;
 
 			return substr( $content, 0, $offset )
 				. "\n"
@@ -289,7 +285,45 @@ class Post extends Base {
 				. substr( $content, $offset );
 		}
 
-
 		return $content;
+	}
+
+	/**
+	 * Generate the serialized Group + synced-pattern reference markup.
+	 *
+	 * @param int $pattern_id Synced pattern (wp_block) post ID.
+	 * @return string Serialized block markup.
+	 */
+	public function generate_serialized_content( int $pattern_id ): string {
+		$block_align     = get_post_meta( $pattern_id, 'pattern_align', true );
+		$block_justify   = get_post_meta( $pattern_id, 'pattern_justify', true );
+		$block_className = 'wp-block-' . str_replace( '/', '-', self::$cta_block_name );
+
+		$wrapper_attributes = array(
+			'className' => sprintf(
+				'%s%s',
+				$block_className,
+				( $block_align ) ? ' align' . $block_align : ''
+			),
+			'align'     => $block_align ?? '',
+			'layout'    => array(
+				'justifyContent' => $block_justify ?? '',
+			),
+		);
+
+		$wrapper_class = $wrapper_attributes['className'];
+
+		$pattern_serialized = sprintf(
+			'<!-- wp:group %1$s -->' . "\n" .
+			'<div class="wp-block-group %2$s">' . "\n" .
+			'<!-- wp:block {"ref":%3$d} /-->' . "\n" .
+			'</div>' . "\n" .
+			'<!-- /wp:group -->',
+			wp_json_encode( $wrapper_attributes ),
+			esc_attr( $wrapper_class ),
+			$pattern_id
+		);
+
+		return $pattern_serialized;
 	}
 }
