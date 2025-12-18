@@ -67,9 +67,9 @@ class Publish_To_Apple_News extends Base {
 	 * @return void
 	 */
 	public function init(): void {
-		add_action( 'acf/include_fields', array( $this, 'register_settings_fields' ) );
+		// add_action( 'acf/include_fields', array( $this, 'register_settings_fields' ) );
 
-		add_action( 'acf/init', array( $this, 'register_options_page' ) );
+		// add_action( 'acf/init', array( $this, 'register_options_page' ) );
 
 		// add_filter( 'apple_news_component_text_styles', array( $this, 'component_text_styles' ) );
 
@@ -458,7 +458,7 @@ class Publish_To_Apple_News extends Base {
 	 * @return array $layouts
 	 */
 	public function component_layouts( array $layouts ): array {
-		$layouts['end-of-article-layout'] = array(
+		$layout_template = array(
 			'columnStart' => 0,
 			'columnSpan'  => 8,
 			'margin'      => array(
@@ -468,15 +468,11 @@ class Publish_To_Apple_News extends Base {
 			'padding'     => 20,
 		);
 
-		$layouts['in-article-layout'] = array(
-			'columnStart' => 0,
-			'columnSpan'  => 8,
-			'margin'      => array(
-				'top'    => 20,
-				'bottom' => 20,
-			),
-			'padding'     => 20,
-		);
+		$layouts['beginning-of-article-layout'] = $layout_template;
+
+		$layouts['end-of-article-layout'] = $layout_template;
+
+		$layouts['in-article-layout'] = $layout_template;
 
 		error_log( __METHOD__ . '  $layouts = ' . print_r( $layouts, true ) );
 		return $layouts;
