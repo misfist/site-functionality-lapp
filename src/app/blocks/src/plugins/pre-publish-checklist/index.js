@@ -20,8 +20,64 @@ const NOTICE_ID_SUGGESTED = 'site-functionality.prepublish-checks.suggested';
 
 const SUPPORTED_POST_TYPES = [ 'post' ];
 
+/**
+ * Condition configuration.
+ */
+const CONDITIONS = {
+	block: {
+		condition: 'suggested',
+		label: __( 'CTA Slot block present', 'site-functionality' ),
 		icon: 'no-alt',
+		messages: {
+			complete: __( 'CTA Slot block is present.', 'site-functionality' ),
+			incomplete: __( 'Consider adding a CTA block.', 'site-functionality' ),
+			error: __( 'Unable to verify whether the CTA Slot block is present.', 'site-functionality' ),
+		},
+	},
+	image: {
+		condition: 'required',
+		label: __( 'Featured Image set', 'site-functionality' ),
+		messages: {
+			complete: __( 'Featured Image is set.', 'site-functionality' ),
+			incomplete: __( 'A Featured Image is required.', 'site-functionality' ),
+			error: __( 'Unable to verify whether a Featured Image is set.', 'site-functionality' ),
+		},
+	},
+	min_dimensions: {
+		condition: 'required',
+		label: __( 'Featured Image meets minimum size', 'site-functionality' ),
+		messages: {
+			complete: __( 'Featured Image meets the minimum size.', 'site-functionality' ),
+			incomplete: sprintf(
+				/* translators: 1: min width, 2: min height */
+				__( 'Featured Image must be at least %1$d × %2$d.', 'site-functionality' ),
+				MIN_FEATURED_WIDTH,
+				MIN_FEATURED_HEIGHT
+			),
+			error: __( 'Unable to verify Featured Image dimensions.', 'site-functionality' ),
+		},
+	},
+	category: {
+		condition: 'required',
+		label: __( 'At least one Category is selected', 'site-functionality' ),
+		messages: {
+			complete: __( 'At least one Category is selected.', 'site-functionality' ),
+			incomplete: __( 'At least one Category is required.', 'site-functionality' ),
+			error: __( 'Unable to verify Categories.', 'site-functionality' ),
+		},
+	},
+	tag: {
+		condition: 'suggested',
 		icon: 'no-alt',
+		label: __( 'Tags have been added', 'site-functionality' ),
+		messages: {
+			complete: __( 'Tags have been added.', 'site-functionality' ),
+			incomplete: __( 'Consider adding Tags to improve discoverability.', 'site-functionality' ),
+			error: __( 'Unable to verify Tags.', 'site-functionality' ),
+		},
+	},
+};
+
 /**
  * Determine whether a post type is supported.
  *
@@ -160,62 +216,6 @@ function isSuggested( conditionType ) {
 }
 
 /**
- * Condition configuration.
- */
-const CONDITIONS = {
-	block: {
-		condition: 'required',
-		label: __( 'CTA Slot block present', 'site-functionality' ),
-		messages: {
-			complete: __( 'CTA Slot block is present.', 'site-functionality' ),
-			incomplete: __( 'CTA Slot block is required.', 'site-functionality' ),
-			error: __( 'Unable to verify whether the CTA Slot block is present.', 'site-functionality' ),
-		},
-	},
-	image: {
-		condition: 'required',
-		label: __( 'Featured Image set', 'site-functionality' ),
-		messages: {
-			complete: __( 'Featured Image is set.', 'site-functionality' ),
-			incomplete: __( 'A Featured Image is required.', 'site-functionality' ),
-			error: __( 'Unable to verify whether a Featured Image is set.', 'site-functionality' ),
-		},
-	},
-	min_dimensions: {
-		condition: 'required',
-		label: __( 'Featured Image meets minimum size', 'site-functionality' ),
-		messages: {
-			complete: __( 'Featured Image meets the minimum size.', 'site-functionality' ),
-			incomplete: sprintf(
-				/* translators: 1: min width, 2: min height */
-				__( 'Featured Image must be at least %1$d × %2$d.', 'site-functionality' ),
-				MIN_FEATURED_WIDTH,
-				MIN_FEATURED_HEIGHT
-			),
-			error: __( 'Unable to verify Featured Image dimensions.', 'site-functionality' ),
-		},
-	},
-	category: {
-		condition: 'required',
-		label: __( 'At least one Category is selected', 'site-functionality' ),
-		messages: {
-			complete: __( 'At least one Category is selected.', 'site-functionality' ),
-			incomplete: __( 'At least one Category is required.', 'site-functionality' ),
-			error: __( 'Unable to verify Categories.', 'site-functionality' ),
-		},
-	},
-	tag: {
-		condition: 'suggested',
-		label: __( 'Tags have been added', 'site-functionality' ),
-		messages: {
-			complete: __( 'Tags have been added.', 'site-functionality' ),
-			incomplete: __( 'Consider adding Tags to improve discoverability.', 'site-functionality' ),
-			error: __( 'Unable to verify Tags.', 'site-functionality' ),
-		},
-	},
-};
-
-/**
  * Evaluate all conditions.
  *
  * @param {Object} state Editor state.
@@ -329,16 +329,10 @@ const PrePublishChecklist = () => {
 		[ supported, unlockPostSaving, removeNotice ]
 	);
 
-	/**
-	 * Bail from rendering as well.
-	 */
 	if ( ! supported ) {
 		return null;
 	}
 
-	/**
-	 * Only run heavier selects for supported post types.
-	 */
 	const state = useSelect(
 		function ( select ) {
 			const editorSelect = select( 'core/editor' );
