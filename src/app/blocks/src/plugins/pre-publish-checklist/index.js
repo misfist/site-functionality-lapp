@@ -20,6 +20,8 @@ const NOTICE_ID_SUGGESTED = 'site-functionality.prepublish-checks.suggested';
 
 const SUPPORTED_POST_TYPES = [ 'post' ];
 
+		icon: 'no-alt',
+		icon: 'no-alt',
 /**
  * Determine whether a post type is supported.
  *
@@ -250,6 +252,7 @@ function evaluateConditions( state ) {
 			key: result.key,
 			type: config.condition,
 			label: config.label,
+			icon: config.icon,
 			complete: Boolean( result.complete ),
 			messages: config.messages,
 		};
@@ -264,15 +267,23 @@ function evaluateConditions( state ) {
  * @return {string} Message.
  */
 function buildNoticeMessage( failures, heading ) {
-	return [
-		heading,
-		' ',
-		failures
-			.map( function ( item ) {
-				return item.messages.incomplete;
-			} )
-			.join( ' | ' ),
-	].join( '' );
+	const items = failures
+		.map( function ( item ) {
+			const icon = item.icon || 'warning';
+
+			return (
+				'<li>' +
+					'<span class="dashicons dashicons-' + icon + '" style="margin-right:6px;vertical-align:middle;"></span>' +
+					item.messages.incomplete +
+				'</li>'
+			);
+		} )
+		.join( '' );
+
+	return (
+		'<strong>' + heading + '</strong>' +
+		'<ul style="margin:8px 0 0 0">' + items + '</ul>'
+	);
 }
 
 const PrePublishChecklist = () => {
@@ -369,6 +380,7 @@ const PrePublishChecklist = () => {
 						id: NOTICE_ID_REQUIRED,
 						type: 'default',
 						isDismissible: false,
+						__unstableHTML: true,
 					}
 				);
 			} else {
@@ -389,6 +401,7 @@ const PrePublishChecklist = () => {
 						id: NOTICE_ID_SUGGESTED,
 						type: 'default',
 						isDismissible: true,
+						__unstableHTML: true,
 					}
 				);
 			} else {
