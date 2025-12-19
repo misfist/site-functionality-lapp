@@ -8,10 +8,55 @@ import { __ } from '@wordpress/i18n';
 import { CheckboxControl, PanelRow, Notice } from '@wordpress/components';
 import { registerPlugin } from '@wordpress/plugins';
 
+const POST_TYPE = 'post';
 const LOCK_KEY = 'site-functionality.prepublish-checks';
 const REQUIRED_BLOCK = 'site-functionality/cta-slot';
 const MIN_FEATURED_WIDTH = 1200;
 const MIN_FEATURED_HEIGHT = 675;
+
+const BLOCKING_NOTICE_ID = 'site-functionality.prepublish-checks.blocking';
+const TAGS_NOTICE_ID = 'site-functionality.prepublish-checks.tags';
+
+/**
+ * Stucture
+ * 
+ * hasBlock()
+ * hasImage()
+ * hasMinDimensions()
+ * hasTerm( taxonomy )
+ * 	hasCategory()
+ * 	hasTag()
+ * isRequired()
+ * isSuggested()
+ * 
+ * const conditions = {
+ * 	'block': {
+ * 		'condition': 'required', //'required', 'suggested'
+ * 		'label': '',
+ * 		'messages': {
+ * 			'complete': '',
+ * 			'incomplete': '',
+ * 			'error': ''
+ * 		}
+ * 	},
+ * 	'image': {
+ * 		'condition': 'required', //'required', 'suggested'
+ * 		'label': '',
+ * 		'messages': {
+ * 			'complete': '',
+ * 			'incomplete': '',
+ * 			'error': ''
+ * 		}
+ * 	}
+ * ...
+ * }
+ * 
+ * displayChecklist()
+ * displayMessage()
+ * displayMessages()
+ * preventPublishing() //don't prevent save?
+ * 
+ */
 
 /**
  * Recursively check whether a block (or any inner block) matches a block name.
@@ -56,8 +101,40 @@ function getMediaDimensions( media ) {
 	return { width: null, height: null };
 }
 
+/**
+ * Build a list of blocking requirement messages.
+ *
+ * @param {Object} args Requirement state.
+ * @return {string[]} List of messages.
+ */
+function getBlockingMessages( args ) {
+	const messages = [];
+
+	if ( ! args.hasRequiredBlock ) {
+		messages.push( __( 'CTA block is required.', 'site-functionality' ) );
+	}
+
+	if ( ! args.hasFeaturedImage ) {
+		messages.push( __( 'A Featured Image is required.', 'site-functionality' ) );
+	} else if ( ! args.meetsFeaturedSize ) {
+		messages.push(
+			__(
+				'The selected Featured Image is too small. Please use an image at least 1200 × 675.',
+				'site-functionality'
+			)
+		);
+	}
+
+	if ( ! args.hasCategory ) {
+		messages.push( __( 'At least one Category is required.', 'site-functionality' ) );
+	}
+
+	return messages;
+}
+
 const PrePublishChecklist = () => {
 	const {
+		postId,
 		postType,
 		blocks,
 		categories,
@@ -71,6 +148,7 @@ const PrePublishChecklist = () => {
 			const featuredId = editorSelect.getEditedPostAttribute( 'featured_media' ) || 0;
 
 			return {
+				postId: editorSelect.getCurrentPostId(),
 				postType: editorSelect.getCurrentPostType(),
 				blocks: select( 'core/block-editor' ).getBlocks() || [],
 				categories: editorSelect.getEditedPostAttribute( 'categories' ) || [],
@@ -82,25 +160,22 @@ const PrePublishChecklist = () => {
 		[]
 	);
 
-	const { lockPostSaving, unlockPostSaving } = useDispatch( 'core/editor' );
+	const isSupportedPostType = postType === POST_TYPE;
 
-	// Optional: limit to specific post types. Remove this block if you want it everywhere.
-	if ( postType !== 'post' ) {
-		useEffect(
-			() => {
-				unlockPostSaving( LOCK_KEY );
-			},
-			[ unlockPostSaving ]
-		);
-
+	if ( ! isSupportedPostType ) {
 		return null;
 	}
 
-	const hasRequiredBlock = hasBlock( blocks, REQUIRED_BLOCK );
+	const { lockPostSaving, unlockPostSaving } = useDispatch( 'core/editor' );
+	const { createNotice, removeNotice } = useDispatch( 'core/notices' );
 
+	const hasRequiredBlock = hasBlock( blocks, REQUIRED_BLOCK );
 	const hasFeaturedImage = featuredImageId > 0;
 
-	const { width: featuredWidth, height: featuredHeight } = getMediaDimensions( featuredMedia );
+	const { 
+		width: featuredWidth, 
+		height: featuredHeight 
+	} = getMediaDimensions( featuredMedia );
 
 	const meetsFeaturedSize =
 		! hasFeaturedImage ||
@@ -109,25 +184,81 @@ const PrePublishChecklist = () => {
 			: true );
 
 	const hasCategory = categories.length > 0;
-
 	const hasTags = tags.length > 0;
 
-	const shouldLock =
-		! hasRequiredBlock ||
-		! hasFeaturedImage ||
-		! meetsFeaturedSize ||
-		! hasCategory;
+	const blockingMessages = getBlockingMessages( {
+		hasRequiredBlock,
+		hasFeaturedImage,
+		meetsFeaturedSize,
+		hasCategory,
+	} );
+
+	// const shouldLock =
+	// 	! hasRequiredBlock ||
+	// 	! hasFeaturedImage ||
+	// 	! meetsFeaturedSize ||
+	// 	! hasCategory;
+
+	const shouldLock = isSupportedPostType && blockingMessages.length > 0;
+
+	const lockKey = LOCK_KEY + '.' + String( postId || 0 );
 
 	useEffect(
 		function () {
-			if ( shouldLock ) {
-				lockPostSaving( LOCK_KEY );
+			if ( ! isSupportedPostType ) {
+				unlockPostSaving( lockKey );
+				removeNotice( BLOCKING_NOTICE_ID );
+				removeNotice( TAGS_NOTICE_ID );
 				return;
 			}
 
-			unlockPostSaving( LOCK_KEY );
+			if ( shouldLock ) {
+				lockPostSaving( lockKey );
+
+				createNotice(
+					'error',
+					[
+						__( 'Cannot publish yet:', 'site-functionality' ),
+						' ',
+						blockingMessages.join( ' | ' ),
+					].join( '' ),
+					{
+						id: BLOCKING_NOTICE_ID,
+						type: 'default',
+						isDismissible: false,
+					}
+				);
+			} else {
+				unlockPostSaving( lockKey );
+				removeNotice( BLOCKING_NOTICE_ID );
+			}
+
+			// Suggested (dismissible) notice.
+			if ( ! hasTags ) {
+				createNotice(
+					'warning',
+					__( 'Consider adding Tags to improve discoverability.', 'site-functionality' ),
+					{
+						id: TAGS_NOTICE_ID,
+						type: 'default',
+						isDismissible: true,
+					}
+				);
+			} else {
+				removeNotice( TAGS_NOTICE_ID );
+			}
 		},
-		[ shouldLock, lockPostSaving, unlockPostSaving ]
+		[ 
+			isSupportedPostType,
+			shouldLock,
+			hasTags,
+			blockingMessages,
+			lockKey,
+			lockPostSaving,
+			unlockPostSaving,
+			createNotice,
+			removeNotice,
+		 ]
 	);
 
 	console.log( 'LOADED' );
