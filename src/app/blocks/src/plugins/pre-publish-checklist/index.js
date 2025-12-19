@@ -9,6 +9,7 @@ import { CheckboxControl, PanelRow } from '@wordpress/components';
 import { registerPlugin } from '@wordpress/plugins';
 
 const LOCK_KEY = 'site-functionality.prepublish-checks';
+const ENFORCE = true; // true = lock saving, false = notices only
 
 const REQUIRED_BLOCK = 'site-functionality/cta-slot';
 const MIN_FEATURED_WIDTH = 1200;
@@ -299,7 +300,9 @@ const PrePublishChecklist = () => {
 				return;
 			}
 
-			unlockPostSaving( LOCK_KEY );
+			if ( ENFORCE ) {
+				unlockPostSaving( LOCK_KEY );
+			}
 			removeNotice( NOTICE_ID_REQUIRED );
 			removeNotice( NOTICE_ID_SUGGESTED );
 		},
@@ -352,7 +355,9 @@ const PrePublishChecklist = () => {
 	useEffect(
 		function () {
 			if ( shouldLock ) {
-				lockPostSaving( LOCK_KEY );
+				if ( ENFORCE ) {
+					lockPostSaving( LOCK_KEY );
+				}
 
 				createNotice(
 					'error',
@@ -367,7 +372,9 @@ const PrePublishChecklist = () => {
 					}
 				);
 			} else {
-				unlockPostSaving( LOCK_KEY );
+				if ( ENFORCE ) {
+					unlockPostSaving( LOCK_KEY );
+				}
 				removeNotice( NOTICE_ID_REQUIRED );
 			}
 
