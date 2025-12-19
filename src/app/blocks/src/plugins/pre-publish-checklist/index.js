@@ -286,6 +286,15 @@ function buildNoticeMessage( failures, heading ) {
 	);
 }
 
+/**
+ * Pre-publish checklist plugin.
+ *
+ * Evaluates required and suggested publishing conditions for supported post types,
+ * displays a checklist in the pre-publish panel, surfaces editor notices for unmet
+ * conditions, and optionally enforces requirements by locking post saving.
+ *
+ * @return {JSX.Element|null} Plugin UI, or null when unsupported.
+ */
 const PrePublishChecklist = () => {
 	/**
 	 * Select postType first so we can bail early and avoid unnecessary selectors.
