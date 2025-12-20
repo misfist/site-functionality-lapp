@@ -60,7 +60,7 @@ class Topic extends Taxonomy {
 		\add_action( self::$taxonomy['id'] . '_edit_form', array( $this, 'hide_description' ) );
 		\add_action( self::$taxonomy['id'] . '_add_form', array( $this, 'hide_description' ) );
 
-		\add_action( 'acf/save_post', array( $this, 'save_description' ) );
+		\add_action( 'acf/save_post', array( $this, 'save_description' ), 20 );
 
 		\add_filter( 'manage_edit-' . self::$taxonomy['id'] . '_columns', array( $this, 'register_column' ) );
 
@@ -310,23 +310,25 @@ class Topic extends Taxonomy {
 	 * @return void
 	 */
 	public function save_description( string $post_id ) {
-		if ( false === strpos( $post_id, '_' ) ) {
+		if ( ! preg_match( '/^term_([0-9]+)$/', $post_id, $matches ) ) {
 			return;
 		}
 
-		list( $taxonomy, $term_id ) = explode( '_', $post_id, 2 );
+		$term_id = absint( $matches[1] );
 
-		if ( self::$taxonomy['id'] !== $taxonomy || ! taxonomy_exists( $taxonomy ) ) {
+		if ( ! $term_id ) {
 			return;
 		}
 
-		$term_id = absint( $term_id );
+		$taxonomy = self::$taxonomy['id'];
+
+		$term = get_term( $term_id );
+
+		if ( ! $term || is_wp_error( $term ) || $taxonomy !== $term->taxonomy ) {
+			return;
+		}
 
 		$description = get_term_meta( $term_id, 'term_description', true );
-
-		if ( '' === $description ) {
-			return;
-		}
 
 		wp_update_term(
 			$term_id,
