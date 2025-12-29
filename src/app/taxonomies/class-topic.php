@@ -58,6 +58,8 @@ class Topic extends Taxonomy {
 
 		\add_filter( 'acf/fields/taxonomy/query', array( $this, 'exlude_current_term' ), 10, 3 );
 
+		\add_filter( 'acf/fields/relationship/query/key=field_featured_posts', array( $this, 'featured_posts' ), 10, 3 );
+
 		\add_action( self::$taxonomy['id'] . '_edit_form', array( $this, 'hide_description' ) );
 		\add_action( self::$taxonomy['id'] . '_add_form', array( $this, 'hide_description' ) );
 
@@ -143,6 +145,38 @@ class Topic extends Taxonomy {
 				'mime_types'        => '',
 				'allow_in_bindings' => 1,
 				'preview_size'      => 'medium',
+			),
+			array(
+				'key'                  => 'field_featured_posts',
+				'label'                => esc_html__( 'Featured', 'site-functionality' ),
+				'name'                 => 'featured_posts',
+				'aria-label'           => '',
+				'type'                 => 'relationship',
+				'instructions'         => '',
+				'required'             => 0,
+				'conditional_logic'    => 0,
+				'wrapper'              => array(
+					'width' => '',
+					'class' => '',
+					'id'    => '',
+				),
+				'post_type'            => array(
+					0 => 'post',
+				),
+				'post_status'          => '',
+				'taxonomy'             => '',
+				'filters'              => array(
+					0 => 'search',
+				),
+				'return_format'        => 'id',
+				'min'                  => 3,
+				'max'                  => 6,
+				'allow_in_bindings'    => 1,
+				'elements'             => array(
+					0 => 'featured_image',
+				),
+				'bidirectional'        => 0,
+				'bidirectional_target' => array(),
 			),
 			array(
 				'key'               => 'field_term_description',
@@ -300,6 +334,31 @@ class Topic extends Taxonomy {
 		if ( term_exists( (int) $term_id, self::$taxonomy['id'] ) ) {
 			$args['exclude'] = (int) $term_id;
 		}
+		return $args;
+	}
+
+	/**
+	 * Limit posts to current taxonomy
+	 * 
+	 * @link https://www.advancedcustomfields.com/resources/acf-fields-relationship-query/
+	 *
+	 * @param array              $args
+	 * @param array              $field
+	 * @param mixed (int|string) $post_id
+	 *
+	 * @return array
+	 */
+	function featured_posts( array $args, array $field, $post_id ): array {
+		$term_id = str_replace( 'term_', '', $post_id );
+		$tax_query = array(
+			array(
+				'taxonomy' => self::$taxonomy['id'],
+				'field'    => 'term_id',
+				'terms'    => array( (int) $term_id ),
+			),
+		);
+
+		$args['tax_query'] = $tax_query;
 		return $args;
 	}
 
