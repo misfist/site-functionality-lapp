@@ -28,6 +28,7 @@ class Topic extends Taxonomy {
 		'menu'         => 'Topics',
 		'post_types'   => array(
 			'post',
+			'newspack_spnsrs_cpt',
 		),
 		'has_archive'  => true,
 		'archive'      => 'topic',
