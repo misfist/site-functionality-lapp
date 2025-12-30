@@ -80,8 +80,8 @@ class Site_Functionality {
 
 		$admin_assets = new Admin_Assets( $this->settings );
 
-		add_action( 'admin_enqueue_scripts', array( $admin_assets, 'enqueue_styles' ) );
-		add_action( 'admin_enqueue_scripts', array( $admin_assets, 'enqueue_scripts' ) );
+		// add_action( 'admin_enqueue_scripts', array( $admin_assets, 'enqueue_styles' ) );
+		// add_action( 'admin_enqueue_scripts', array( $admin_assets, 'enqueue_scripts' ) );
 	}
 
 	/**

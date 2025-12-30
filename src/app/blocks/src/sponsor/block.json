@@ -1,0 +1,32 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "site-functionality/sponsor",
+	"version": "0.1.0",
+	"title": "Sponsor",
+	"category": "lapp",
+	"icon": "money-alt",
+	"description": "Display sponsor.",
+	"attributes": {
+		"objectId": {
+			"type": "string",
+			"default": "0"
+		},
+		"objectType": {
+			"type": "string"
+		}
+	},
+	"usesContext": [ "postId", "termId" ],
+	"example": {},
+	"supports": {
+		"html": false,
+		"align": true,
+		"customClassName": true
+	},
+	"textdomain": "site-functionality",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php",
+	"viewScript": "file:./view.js"
+}

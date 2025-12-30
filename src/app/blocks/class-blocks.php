@@ -40,18 +40,49 @@ class Blocks extends Base {
 
 		add_action( 'init', array( $this, 'register_blocks' ) );
 
-		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_scripts' ) );
+		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_blackend_scripts' ) );
+
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_block_frontend_scripts' ) );
 
 		add_filter( 'block_categories_all', array( $this, 'register_block_category' ), 10, 2 );
 	}
 
 	/**
-	 * Registers blocks using metadata from `block.json`.
+	 * Register blocks
 	 *
 	 * @return void
 	 */
 	public function register_blocks(): void {
-		register_block_type_from_metadata( __DIR__ . '/build/cta-slot' );
+		/**
+		 * Registers the block(s) metadata from the `blocks-manifest.php` and registers the block type(s)
+		 * based on the registered block metadata.
+		 * Added in WordPress 6.8 to simplify the block metadata registration process added in WordPress 6.7.
+		 *
+		 * @see https://make.wordpress.org/core/2025/03/13/more-efficient-block-type-registration-in-6-8/
+		 */
+		if ( function_exists( 'wp_register_block_types_from_metadata_collection' ) ) {
+			wp_register_block_types_from_metadata_collection( __DIR__ . '/build', __DIR__ . '/build/blocks-manifest.php' );
+			return;
+		}
+
+		/**
+		 * Registers the block(s) metadata from the `blocks-manifest.php` file.
+		 * Added to WordPress 6.7 to improve the performance of block type registration.
+		 *
+		 * @see https://make.wordpress.org/core/2024/10/17/new-block-type-registration-apis-to-improve-performance-in-wordpress-6-7/
+		 */
+		if ( function_exists( 'wp_register_block_metadata_collection' ) ) {
+			wp_register_block_metadata_collection( __DIR__ . '/build', __DIR__ . '/build/blocks-manifest.php' );
+		}
+		/**
+		 * Registers the block type(s) in the `blocks-manifest.php` file.
+		 *
+		 * @see https://developer.wordpress.org/reference/functions/register_block_type/
+		 */
+		$manifest_data = require __DIR__ . '/build/blocks-manifest.php';
+		foreach ( array_keys( $manifest_data ) as $block_type ) {
+			register_block_type( __DIR__ . "/build/{$block_type}" );
+		}
 	}
 
 	/**
@@ -142,11 +173,70 @@ class Blocks extends Base {
 	}
 
 	/**
+	 * Get sponsors block.
+	 *
+	 * @param array  $attributes Block attributes.
+	 * @param string $content    Block content.
+	 * @param object $block      Block instance.
+	 * @return string
+	 */
+	public function get_sponsors_block( array $attributes, string $content, $block ): string {
+		if (
+		! function_exists( 'newspack_get_all_sponsors' )
+		|| ! function_exists( 'newspack_get_native_sponsors' )
+		|| ! function_exists( 'newspack_sponsor_logo_list' )
+		|| ! function_exists( 'newspack_sponsor_byline' )
+		) {
+			return '';
+		}
+
+		$object_id = ! empty( $attributes['objectId'] ) ? absint( $attributes['objectId'] ) : 0;
+		$context   = ! empty( $attributes['objectType'] ) ? sanitize_key( $attributes['objectType'] ) : 'term';
+
+		if ( ! $object_id ) {
+			$object_id = ( 'post' === $context ) ? get_the_ID() : get_queried_object_id();
+		}
+
+		if ( ! $object_id ) {
+			return '';
+		}
+
+		$all_sponsors = newspack_get_all_sponsors( $object_id );
+		$sponsors     = newspack_get_native_sponsors( $all_sponsors );
+
+		if ( empty( $sponsors ) || ! is_array( $sponsors ) ) {
+			return '';
+		}
+
+		ob_start();
+		?>
+			<div class="entry-meta entry-sponsor">
+				<?php newspack_sponsor_logo_list( $sponsors ); ?>
+				<span class="sponsor-byline"><?php newspack_sponsor_byline( $sponsors ); ?></span>
+			</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Render sponsor block
+	 *
+	 * @param array  $attributes Block attributes.
+	 * @param string $content    Block content.
+	 * @param object $block      Block instance.
+	 * @return string
+	 */
+	public function render_sponsors_block( array $attributes, string $content, $block ): void {
+		$html = get_sponsors_block( $attributes, $content, $block );
+		echo $html;
+	}
+
+	/**
 	 * Enqueue blocks scripts
 	 *
 	 * @return void
 	 */
-	public function enqueue_blocks_scripts(): void {
+	public function enqueue_block_blackend_scripts(): void {
 		$asset_file_path = \plugin_dir_path( __FILE__ ) . 'build/index.asset.php';
 		$version         = $this->settings->get_plugin_version();
 
@@ -186,6 +276,42 @@ class Blocks extends Base {
 		wp_add_inline_style(
 			'site-functionality',
 			'.is-hierarchical-post-tags .editor-post-taxonomies__hierarchical-terms-add{display:none;pointer-events:none;}'
+		);
+	}
+
+	/**
+	 * Enqueue blocks scripts
+	 *
+	 * @return void
+	 */
+	public function enqueue_block_frontend_scripts(): void {
+		$asset_file_path = \plugin_dir_path( __FILE__ ) . 'build/index.asset.php';
+		$version         = $this->settings->get_plugin_version();
+
+		if ( is_readable( $asset_file_path ) ) {
+			$asset_file = include $asset_file_path;
+		} else {
+			$asset_file = array(
+				'version'      => $version,
+				'dependencies' => array(
+					'wp-blocks',
+					'wp-components',
+					'wp-data',
+					'wp-edit-blocks',
+					'wp-editor',
+					'wp-element',
+					'wp-i18n',
+					'wp-plugins',
+				),
+			);
+		}
+
+		wp_enqueue_style(
+			'site-functionality-styles',
+			\plugins_url( '/build/style-index.css', __FILE__ ),
+			array(),
+			$asset_file['version'],
+			'screen'
 		);
 	}
 }
