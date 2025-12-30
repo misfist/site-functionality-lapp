@@ -180,12 +180,12 @@ class Blocks extends Base {
 	 * @param object $block      Block instance.
 	 * @return string
 	 */
-	public function get_sponsors_block( array $attributes, string $content, $block ): string {
+	public static function get_sponsors_block( array $attributes, string $content, $block ): string {
 		if (
-		! function_exists( 'newspack_get_all_sponsors' )
-		|| ! function_exists( 'newspack_get_native_sponsors' )
-		|| ! function_exists( 'newspack_sponsor_logo_list' )
-		|| ! function_exists( 'newspack_sponsor_byline' )
+		! function_exists( '\newspack_get_all_sponsors' )
+		|| ! function_exists( '\newspack_get_native_sponsors' )
+		|| ! function_exists( '\newspack_sponsor_logo_list' )
+		|| ! function_exists( '\newspack_sponsor_byline' )
 		) {
 			return '';
 		}
@@ -201,8 +201,8 @@ class Blocks extends Base {
 			return '';
 		}
 
-		$all_sponsors = newspack_get_all_sponsors( $object_id );
-		$sponsors     = newspack_get_native_sponsors( $all_sponsors );
+		$all_sponsors = \newspack_get_all_sponsors( $object_id );
+		$sponsors     = \newspack_get_native_sponsors( $all_sponsors );
 
 		if ( empty( $sponsors ) || ! is_array( $sponsors ) ) {
 			return '';
@@ -211,8 +211,8 @@ class Blocks extends Base {
 		ob_start();
 		?>
 			<div class="entry-meta entry-sponsor">
-				<?php newspack_sponsor_logo_list( $sponsors ); ?>
-				<span class="sponsor-byline"><?php newspack_sponsor_byline( $sponsors ); ?></span>
+				<?php \newspack_sponsor_logo_list( $sponsors ); ?>
+				<span class="sponsor-byline"><?php \newspack_sponsor_byline( $sponsors ); ?></span>
 			</div>
 		<?php
 		return ob_get_clean();
@@ -226,8 +226,8 @@ class Blocks extends Base {
 	 * @param object $block      Block instance.
 	 * @return string
 	 */
-	public function render_sponsors_block( array $attributes, string $content, $block ): void {
-		$html = get_sponsors_block( $attributes, $content, $block );
+	public static function render_sponsors_block( array $attributes, string $content, $block ): void {
+		$html = self::get_sponsors_block( $attributes, $content, $block );
 		echo $html;
 	}
 
