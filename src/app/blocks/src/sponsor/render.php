@@ -9,8 +9,7 @@
  *
  * @see https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/block-api/block-metadata.md#render
  */
-// use function Lapp_Classic\render_sponsors_block;
-use function Site_Functionality\App\Blocks\render_sponsors_block;
+use Site_Functionality\App\Blocks\Blocks;
 
 $wrapper_attributes = get_block_wrapper_attributes(
 	array(
@@ -20,5 +19,5 @@ $wrapper_attributes = get_block_wrapper_attributes(
 
 ?>
 <div <?php echo $wrapper_attributes; ?>>
-	<?php Lapp_Classic\render_sponsors_block( $attributes, $content, $block ); ?>
+	<?php Blocks::render_sponsors_block( $attributes, $content, $block ); ?>
 </div>
