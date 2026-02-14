@@ -190,7 +190,7 @@ class Topic extends Taxonomy {
 					0 => 'search',
 				),
 				'return_format'        => 'id',
-				'min'                  => 3,
+				'min'                  => 0,
 				'max'                  => 6,
 				'allow_in_bindings'    => 1,
 				'elements'             => array(
@@ -269,27 +269,6 @@ class Topic extends Taxonomy {
 					),
 				),
 			),
-			// array(
-			// 	'key'               => 'field_sponsor_information',
-			// 	'label'             => esc_html__( 'Sponsor Information', 'site-functionality' ),
-			// 	'name'              => 'sponsor_information',
-			// 	'aria-label'        => '',
-			// 	'type'              => 'wysiwyg',
-			// 	'instructions'      => '',
-			// 	'required'          => 0,
-			// 	'conditional_logic' => 0,
-			// 	'wrapper'           => array(
-			// 		'width' => '',
-			// 		'class' => '',
-			// 		'id'    => '',
-			// 	),
-			// 	'default_value'     => '',
-			// 	'allow_in_bindings' => 1,
-			// 	'tabs'              => 'all',
-			// 	'toolbar'           => 'basic',
-			// 	'media_upload'      => 1,
-			// 	'delay'             => 0,
-			// ),
 		);
 
 		\acf_add_local_field_group(
